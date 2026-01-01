@@ -9,8 +9,16 @@ import (
 	"github.com/fatih/color"
 )
 
-// === Control global de logs ===
 var EnableLogs = true
+
+var (
+	colorSuccess = color.New(color.FgGreen)
+	colorInfo    = color.New(color.FgCyan)
+	colorWarn    = color.New(color.FgYellow)
+	colorError   = color.New(color.FgRed)
+	colorFatal   = color.New(color.FgHiRed, color.Bold)
+	colorRoute   = color.New(color.FgHiWhite)
+)
 
 func DisableLogs() {
 	log.SetOutput(io.Discard)
@@ -22,43 +30,25 @@ func EnableConsoleLogs() {
 	EnableLogs = true
 }
 
-// === Tipo de log ===
-type LogLevel struct {
-	Prefix string
-	Icon   string
-	Color  *color.Color
-	Fatal  bool
-}
-
-// === Definiciones de niveles ===
-var (
-	Success = LogLevel{"SUCCESS", "✔", color.New(color.FgGreen), false}
-	Info    = LogLevel{"INFO", "ℹ", color.New(color.FgCyan), false}
-	Warning = LogLevel{"WARNING", "⚠", color.New(color.FgYellow), false}
-	Error   = LogLevel{"ERROR", "✖", color.New(color.FgRed), false}
-	Fatal   = LogLevel{"FATAL", "💀", color.New(color.FgHiRed, color.Bold), true}
-)
-
-// === Función base ===
-func logMessage(level LogLevel, format string, args ...interface{}) {
-	if !EnableLogs && !level.Fatal {
+func logMessage(prefix, icon string, c *color.Color, fatal bool, format string, args ...interface{}) {
+	if !EnableLogs && !fatal {
 		return
 	}
 
 	message := fmt.Sprintf(format, args...)
-	formatted := fmt.Sprintf("[%s] [%s %s]", level.Prefix, level.Icon, message)
-	colored := level.Color.Sprint(formatted)
+	formatted := fmt.Sprintf("[%s] %s %s", prefix, icon, message)
+	colored := c.Sprint(formatted)
 
-	if level.Fatal {
+	if fatal {
 		log.Fatal(colored)
 	} else {
 		log.Println(colored)
 	}
 }
 
-// === Funciones públicas ===
-func LogSuccess(msg string, args ...any) { logMessage(Success, msg, args...) }
-func LogInfo(msg string, args ...any)    { logMessage(Info, msg, args...) }
-func LogWarn(msg string, args ...any)    { logMessage(Warning, msg, args...) }
-func LogError(msg string, args ...any)   { logMessage(Error, msg, args...) }
-func LogFatal(msg string, args ...any)   { logMessage(Fatal, msg, args...) }
+// Funciones estándar
+func LogSuccess(m string, a ...any) { logMessage("SUCCESS", "✔", colorSuccess, false, m, a...) }
+func LogInfo(m string, a ...any)    { logMessage("INFO", "ℹ", colorInfo, false, m, a...) }
+func LogWarn(m string, a ...any)    { logMessage("WARNING", "⚠", colorWarn, false, m, a...) }
+func LogError(m string, a ...any)   { logMessage("ERROR", "✖", colorError, false, m, a...) }
+func LogFatal(m string, a ...any)   { logMessage("FATAL", "💀", colorFatal, true, m, a...) }
