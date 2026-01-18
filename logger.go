@@ -55,7 +55,7 @@ func LogError(m string, a ...any)   { logMessage("ERROR", "✖", colorError, fal
 func LogFatal(m string, a ...any)   { logMessage("FATAL", "💀", colorFatal, true, m, a...) }
 
 func LogSecurityToDB(userID *uuid.UUID, message, endpoint, ip string, extra any) {
-	_ = DB.Create(&AppLog{
+	logEntry := &domain.AppLog{
 		UserID:   userID,
 		Level:    "SECURITY",
 		Message:  message,
@@ -64,7 +64,12 @@ func LogSecurityToDB(userID *uuid.UUID, message, endpoint, ip string, extra any)
 		Extra:    marshalExtra(extra),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-	}).Error
+	}
+
+	if err := config.DB.Create(logEntry).Error; err != nil {
+		LogError("No se pudo guardar log de seguridad en DB: %v", err)
+	}
 }
+
 
 
