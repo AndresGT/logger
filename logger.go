@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-	"github.com/google/uuid"
+	//"github.com/google/uuid"
 )
 
 var EnableLogs = true
@@ -54,22 +54,22 @@ func LogWarn(m string, a ...any)    { logMessage("WARNING", "⚠", colorWarn, fa
 func LogError(m string, a ...any)   { logMessage("ERROR", "✖", colorError, false, m, a...) }
 func LogFatal(m string, a ...any)   { logMessage("FATAL", "💀", colorFatal, true, m, a...) }
 
-func LogSecurityToDB(userID *uuid.UUID, message, endpoint, ip string, extra any) {
-	logEntry := &domain.AppLog{
-		UserID:   userID,
-		Level:    "SECURITY",
-		Message:  message,
-		Endpoint: endpoint,
-		IP:       ip,
-		Extra:    marshalExtra(extra),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
+// func LogSecurityToDB(userID *uuid.UUID, message, endpoint, ip string, extra any) {
+// 	logEntry := &domain.AppLog{
+// 		UserID:   userID,
+// 		Level:    "SECURITY",
+// 		Message:  message,
+// 		Endpoint: endpoint,
+// 		IP:       ip,
+// 		Extra:    marshalExtra(extra),
+// 		CreatedAt: time.Now(),
+// 		UpdatedAt: time.Now(),
+// 	}
 
-	if err := config.DB.Create(logEntry).Error; err != nil {
-		LogError("No se pudo guardar log de seguridad en DB: %v", err)
-	}
-}
+// 	if err := config.DB.Create(logEntry).Error; err != nil {
+// 		LogError("No se pudo guardar log de seguridad en DB: %v", err)
+// 	}
+// }
 
 
 
